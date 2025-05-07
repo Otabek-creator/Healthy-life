@@ -66,6 +66,6 @@ I am a Backend Developer <img src="https://media.giphy.com/media/WUlplcMpOCEmTGB
 ### :writing_hand: Blog Posts :
 
 <!-- BLOG-POST-LIST:START -->
-This site is new and best blog-site
+With this site, you can manage your healthy
 <!-- BLOG-POST-LIST:END -->
 
