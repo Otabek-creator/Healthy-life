@@ -1,0 +1,152 @@
+{% extends 'accounts/dashboard.html' %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 class="text-2xl font-bold">Statistika va hisobotlar</h2>
+
+        <div class="flex flex-col sm:flex-row gap-2">
+            <form method="get" class="flex items-center">
+                <input type="date" name="start_date" value="{{ start_date|date:'Y-m-d' }}" class="border border-gray-300 rounded-md px-4 py-2">
+                <span class="mx-2">-</span>
+                <input type="date" name="end_date" value="{{ end_date|date:'Y-m-d' }}" class="border border-gray-300 rounded-md px-4 py-2">
+                <button type="submit" class="ml-2 bg-green-600 text-white px-4 py-2 rounded-md">Ko'rish</button>
+            </form>
+            <a href="{% url 'download_stats_pdf' %}?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}"
+               class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                PDF yuklab olish
+            </a>
+
+        </div>
+    </div>
+
+    <!-- Calories Report -->
+    <div id="calories-report" class="stats-report">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-2 border-b">
+                    <h3 class="text-sm font-medium">O'rtacha kunlik kaloriya</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="text-2xl font-bold">{{ avg_daily_calories }} kcal</div>
+                    <p class="text-xs text-gray-500">Tanlangan davr uchun o'rtacha kunlik kaloriya</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-2 border-b">
+                    <h3 class="text-sm font-medium">O'rtacha sarflangan kaloriya</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="text-2xl font-bold">{{ avg_burned_calories }} kcal</div>
+                    <p class="text-xs text-gray-500">Tanlangan davr uchun o'rtacha sarflangan kaloriya</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-2 border-b">
+                    <h3 class="text-sm font-medium">Jami sof kaloriya</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="text-2xl font-bold">{{ total_net_calories }} kcal</div>
+                    <p class="text-xs text-gray-500">Tanlangan davr uchun jami sof kaloriya (iste'mol - sarflangan)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden mt-6">
+            <div class="px-6 py-4 border-b">
+                <h2 class="text-xl font-bold">Kaloriya tarixi</h2>
+                <p class="text-gray-500 text-sm">{{ start_date|date:'Y-m-d' }} - {{ end_date|date:'Y-m-d' }} davri uchun kunlik kaloriya ma'lumotlari</p>
+            </div>
+            <div class="px-6 py-4">
+                <canvas id="calorieChart" height="100"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden mt-6">
+            <div class="px-6 py-4 border-b">
+                <h2 class="text-xl font-bold">Mashg'ulotlar statistikasi</h2>
+                <p class="text-gray-500 text-sm">{{ start_date|date:'Y-m-d' }} - {{ end_date|date:'Y-m-d' }} davri uchun</p>
+            </div>
+            <div class="px-6 py-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="text-2xl font-bold">{{ total_workout_count }}</div>
+                        <p class="text-sm text-gray-500">Jami mashg'ulotlar</p>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="text-2xl font-bold">{{ total_workout_duration }} daqiqa</div>
+                        <p class="text-sm text-gray-500">Jami vaqt</p>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="text-2xl font-bold">{{ total_workout_calories }} kcal</div>
+                        <p class="text-sm text-gray-500">Jami sarflangan kaloriya</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Chart data
+        const dates = {{ dates|safe }};
+        const caloriesConsumed = {{ calories_consumed|safe }};
+        const caloriesBurned = {{ calories_burned|safe }};
+
+        // Create calorie chart
+        const ctx = document.getElementById('calorieChart').getContext('2d');
+        const calorieChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dates,
+                datasets: [
+                    {
+                        label: 'Iste\'mol qilingan kaloriya',
+                        data: caloriesConsumed,
+                        backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                        borderColor: 'rgba(34, 197, 94, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Sarflangan kaloriya',
+                        data: caloriesBurned,
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Kaloriya (kcal)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Sana'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

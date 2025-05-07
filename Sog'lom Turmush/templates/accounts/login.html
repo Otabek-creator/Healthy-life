@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="login-page min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="max-w-md w-full space-y-8">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold text-green-800">Sog'lom Turmush</h1>
+            <p class="mt-2 text-gray-600">Sog'lom hayot uchun yaxshi tanlov</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="px-6 py-4">
+                <h2 class="text-xl font-bold text-center">Kirish</h2>
+                <p class="text-center text-gray-500 text-sm">Hisobingizga kiring yoki yangi hisob yarating</p>
+            </div>
+            <div class="px-6 py-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="grid w-full items-center gap-4">
+                        <div class="flex flex-col space-y-1.5">
+                            <label for="id_username" class="text-sm font-medium">Foydalanuvchi nomi</label>
+                            {{ form.username }}
+                        </div>
+                        <div class="flex flex-col space-y-1.5">
+                            <label for="id_password" class="text-sm font-medium">Parol</label>
+                            {{ form.password }}
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-2 mt-4">
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md">Kirish</button>
+                    </div>
+                </form>
+            </div>
+            <div class="px-6 py-4 border-t">
+                <a href="{% url 'register' %}" class="block w-full border border-gray-300 py-2 rounded-md text-center">Ro'yxatdan o'tish</a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-8">
+            <div class="bg-white/80 rounded-lg shadow-sm p-4">
+                <div class="flex flex-col items-center text-center">
+                    <i data-lucide="salad" class="h-12 w-12 text-green-600 mb-2"></i>
+                    <h3 class="font-medium">Ovqatlanishni kuzating</h3>
+                    <p class="text-sm text-gray-500">Kaloriya va makronutrientlarni hisobga oling</p>
+                </div>
+            </div>
+            <div class="bg-white/80 rounded-lg shadow-sm p-4">
+                <div class="flex flex-col items-center text-center">
+                    <i data-lucide="dumbbell" class="h-12 w-12 text-green-600 mb-2"></i>
+                    <h3 class="font-medium">Mashg'ulotlarni rejalashtiring</h3>
+                    <p class="text-sm text-gray-500">Faolligingizni kuzatib boring</p>
+                </div>
+            </div>
+            <div class="bg-white/80 rounded-lg shadow-sm p-4">
+                <div class="flex flex-col items-center text-center">
+                    <i data-lucide="heart" class="h-12 w-12 text-green-600 mb-2"></i>
+                    <h3 class="font-medium">Sog'liqni yaxshilang</h3>
+                    <p class="text-sm text-gray-500">Sog'lom turmush tarzini rivojlantiring</p>
+                </div>
+            </div>
+            <div class="bg-white/80 rounded-lg shadow-sm p-4">
+                <div class="flex flex-col items-center text-center">
+                    <i data-lucide="apple" class="h-12 w-12 text-green-600 mb-2"></i>
+                    <h3 class="font-medium">Natijalarni ko'ring</h3>
+                    <p class="text-sm text-gray-500">Statistika va hisobotlarni tahlil qiling</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

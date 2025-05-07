@@ -1,0 +1,115 @@
+{% extends 'accounts/dashboard.html' %}
+
+{% load health_extras %}
+{% block content %}
+{{ block.super }}
+<div class="space-y-6">
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden md:col-span-2">
+                <div class="px-6 py-4 border-b">
+                    <h2 class="text-xl font-bold">Profil ma'lumotlari</h2>
+                    <p class="text-gray-500 text-sm">Shaxsiy ma'lumotlaringizni yangilang</p>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="space-y-2">
+                            <label for="id_name" class="text-sm font-medium">Ism</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <p class="text-red-500 text-xs">{{ form.name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label for="id_age" class="text-sm font-medium">Yosh</label>
+                                {{ form.age }}
+                                {% if form.age.errors %}
+                                    <p class="text-red-500 text-xs">{{ form.age.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="id_gender" class="text-sm font-medium">Jins</label>
+                                {{ form.gender }}
+                                {% if form.gender.errors %}
+                                    <p class="text-red-500 text-xs">{{ form.gender.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label for="id_weight" class="text-sm font-medium">Vazn (kg)</label>
+                                {{ form.weight }}
+                                {% if form.weight.errors %}
+                                    <p class="text-red-500 text-xs">{{ form.weight.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="id_height" class="text-sm font-medium">Bo'y (cm)</label>
+                                {{ form.height }}
+                                {% if form.height.errors %}
+                                    <p class="text-red-500 text-xs">{{ form.height.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="id_activity_level" class="text-sm font-medium">Faollik darajasi</label>
+                            {{ form.activity_level }}
+                            {% if form.activity_level.errors %}
+                                <p class="text-red-500 text-xs">{{ form.activity_level.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 border-t">
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md">Saqlash</button>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="px-6 py-4 border-b">
+                        <h2 class="text-lg font-bold">Tana vazni indeksi (BMI)</h2>
+                        <p class="text-gray-500 text-sm">Sizning joriy BMI ko'rsatkichingiz</p>
+                    </div>
+                    <div class="px-6 py-4 flex flex-col items-center">
+                        <div class="text-5xl font-bold text-green-600 mb-2">{{ bmi|floatformat:1 }}</div>
+                        <div class="text-lg font-medium">{{ bmi_category }}</div>
+                        <div class="w-full bg-gray-200 h-2 rounded-full mt-4">
+                            <div class="h-2 rounded-full
+                                {% if bmi < 18.5 %}bg-blue-500{% elif bmi < 25 %}bg-green-500{% elif bmi < 30 %}bg-yellow-500{% else %}bg-red-500{% endif %}"
+                                style="width: {{ bmi|floatformat:0|multiply:2.5 }}%"></div>
+                        </div>
+                        <div class="w-full flex justify-between text-xs text-gray-500 mt-1">
+                            <span>18.5</span>
+                            <span>25</span>
+                            <span>30</span>
+                            <span>40</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="px-6 py-4 border-b">
+                        <h2 class="text-lg font-bold">Kunlik kaloriya</h2>
+                        <p class="text-gray-500 text-sm">Tavsiya etilgan kunlik kaloriya miqdori</p>
+                    </div>
+                    <div class="px-6 py-4 flex flex-col items-center">
+                        <div class="text-5xl font-bold text-green-600 mb-2">{{ daily_calories }}</div>
+                        <div class="text-lg font-medium">kcal</div>
+                        <p class="text-sm text-gray-500 text-center mt-4">
+                            Bu ko'rsatkich sizning jins, yosh, vazn, bo'y va faollik darajangizga asoslangan
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

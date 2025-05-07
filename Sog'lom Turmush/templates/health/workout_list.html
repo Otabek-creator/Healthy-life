@@ -1,0 +1,218 @@
+{% extends 'accounts/dashboard.html' %}
+{% load health_extras %}
+
+{% block content %}
+{{ block.super }}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold">Mashg'ulotlar</h2>
+        <form method="get" class="flex items-center">
+            <input type="date" name="date" value="{{ today|date:'Y-m-d' }}" class="border border-gray-300 rounded-md px-4 py-2 w-[240px]">
+            <button type="submit" class="ml-2 bg-green-600 text-white px-4 py-2 rounded-md">Ko'rish</button>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-2 space-y-4">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-4 border-b">
+                    <h2 class="text-xl font-bold">Mashg'ulot qo'shish</h2>
+                    <p class="text-gray-500 text-sm">Bugungi mashg'ulotlaringizni rejalashtiring</p>
+                </div>
+                <div class="px-6 py-4 space-y-4">
+                    <form method="post" action="{% url 'add_workout' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="date" value="{{ today|date:'Y-m-d' }}">
+
+                        {% if form.errors %}
+                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                                <strong class="font-bold">Xatolik:</strong>
+                                <ul>
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label for="id_name" class="text-sm font-medium">Mashg'ulot turi</label>
+                                {{ form.name }}
+                            </div>
+                            <div class="space-y-2">
+                                <label for="id_duration" class="text-sm font-medium">Davomiyligi (daqiqa)</label>
+                                {{ form.duration }}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div class="space-y-2">
+                                <label for="id_intensity" class="text-sm font-medium">Intensivligi</label>
+                                {{ form.intensity }}
+                            </div>
+                            <div class="space-y-2">
+                                <label for="id_status" class="text-sm font-medium">Holati</label>
+                                {{ form.status }}
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 mt-4">
+                            <label class="text-sm font-medium">Taxminiy sarflangan kaloriya</label>
+                            <div class="text-2xl font-bold text-green-600" id="estimated-calories">0 kcal</div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md mt-4">Qo'shish</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b">
+                <h2 class="text-xl font-bold">Bugungi natijalar</h2>
+                <p class="text-gray-500 text-sm">{{ today|date:'Y-m-d' }} uchun</p>
+            </div>
+            <div class="px-6 py-4 space-y-4">
+                <div class="space-y-2">
+                    <h4 class="text-sm font-medium">Sarflangan kaloriya</h4>
+                    <div class="text-3xl font-bold text-green-600">{{ total_calories_burned }} kcal</div>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="text-sm font-medium">Mashg'ulotlar</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-green-100 p-3 rounded-md text-center">
+                            <div class="text-lg font-bold text-green-700">{{ completed_workouts }}</div>
+                            <div class="text-xs text-gray-600">Bajarilgan</div>
+                        </div>
+                        <div class="bg-orange-100 p-3 rounded-md text-center">
+                            <div class="text-lg font-bold text-orange-700">{{ planned_workouts }}</div>
+                            <div class="text-xs text-gray-600">Rejalashtirilgan</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="text-sm font-medium">Jami vaqt</h4>
+                    <div class="text-xl font-bold">{{ total_duration }} daqiqa</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b">
+            <h2 class="text-xl font-bold">Mashg'ulotlar ro'yxati</h2>
+            <p class="text-gray-500 text-sm">{{ today|date:'Y-m-d' }} kuni uchun rejalashtirilgan mashg'ulotlar</p>
+        </div>
+        <div class="px-6 py-4">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[50px]">Holati</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mashg'ulot turi</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Davomiyligi</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Intensivligi</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kaloriya</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amallar</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for workout in workouts %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="{% url 'update_workout_status' workout.id %}" class="inline-block">
+                                {% if workout.status == 'Bajarilgan' %}
+                                <div class="h-5 w-5 bg-green-500 rounded-full"></div>
+                                {% else %}
+                                <div class="h-5 w-5 bg-gray-300 rounded-full"></div>
+                                {% endif %}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ workout.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ workout.duration }} daqiqa</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ workout.intensity }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ workout.calories_burned }} kcal</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <a href="{% url 'delete_workout' workout.id %}" class="text-red-600 hover:text-red-900" onclick="return confirm('Haqiqatan ham bu mashg\'ulotni o\'chirmoqchimisiz?');">
+                                <i data-lucide="trash-2" class="h-5 w-5"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr id="no-workout-entries" class="text-center">
+                        <td colspan="6" class="px-6 py-6 text-gray-500">Hozircha rejalashtirilgan mashg'ulotlar yo'q</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nameSelect = document.getElementById('id_name');
+    const durationInput = document.getElementById('id_duration');
+    const intensitySelect = document.getElementById('id_intensity');
+    const estimatedCaloriesDisplay = document.getElementById('estimated-calories');
+
+    // MET qiymatlari (serverdagi bilan mos bo'lishi kerak)
+    const workoutMetValues = {
+        'Yugurish': {'Kam': 4.0, 'O\'rta': 7.0, 'Yuqori': 10.0},
+        'Velosiped': {'Kam': 3.5, 'O\'rta': 5.5, 'Yuqori': 8.0},
+        'Suvda suzish': {'Kam': 4.5, 'O\'rta': 7.0, 'Yuqori': 10.0},
+        'Og\'ir atletika': {'Kam': 3.0, 'O\'rta': 5.0, 'Yuqori': 7.0},
+        'Yoga': {'Kam': 2.5, 'O\'rta': 3.5, 'Yuqori': 5.0},
+        'Piyoda yurish': {'Kam': 2.5, 'O\'rta': 4.0, 'Yuqori': 6.0},
+        'Tosh ko\'tarish': {'Kam': 3.5, 'O\'rta': 5.5, 'Yuqori': 8.0},
+        'Anjumaniya (squat)': {'Kam': 3.0, 'O\'rta': 5.0, 'Yuqori': 7.0},
+        'Push-up': {'Kam': 3.0, 'O\'rta': 5.0, 'Yuqori': 7.0},
+        'Plank': {'Kam': 2.5, 'O\'rta': 4.0, 'Yuqori': 6.0},
+        'Burpee': {'Kam': 4.0, 'O\'rta': 6.0, 'Yuqori': 8.0},
+        'Jumping jacks': {'Kam': 3.5, 'O\'rta': 5.5, 'Yuqori': 7.5},
+        'Lunges': {'Kam': 3.0, 'O\'rta': 5.0, 'Yuqori': 7.0},
+        'Pull-up': {'Kam': 3.5, 'O\'rta': 5.5, 'Yuqori': 7.5},
+        'Deadlift': {'Kam': 3.5, 'O\'rta': 5.5, 'Yuqori': 7.5},
+        'Bench press': {'Kam': 3.0, 'O\'rta': 5.0, 'Yuqori': 7.0},
+        'Kardio mashqlar': {'Kam': 4.0, 'O\'rta': 6.0, 'Yuqori': 8.0},
+        'Zumba': {'Kam': 4.0, 'O\'rta': 6.0, 'Yuqori': 8.0},
+        'Pilates': {'Kam': 2.5, 'O\'rta': 3.5, 'Yuqori': 5.0},
+        'Interval trening': {'Kam': 5.0, 'O\'rta': 7.0, 'Yuqori': 9.0},
+        'Rassomchilik': {'Kam': 3.0, 'O\'rta': 5.0, 'Yuqori': 7.0},
+        'Kettlebell mashqlari': {'Kam': 4.0, 'O\'rta': 6.0, 'Yuqori': 8.0},
+        'Boxing': {'Kam': 4.5, 'O\'rta': 6.5, 'Yuqori': 9.0},
+        'Qilichbozlik': {'Kam': 4.0, 'O\'rta': 6.0, 'Yuqori': 8.0},
+        'Tennis': {'Kam': 5.0, 'O\'rta': 7.0, 'Yuqori': 9.0},
+    };
+
+    function calculateCaloriesBurned() {
+        const name = nameSelect.value;
+        const duration = parseInt(durationInput.value) || 0;
+        const intensity = intensitySelect.value;
+        const weight = {{ user.profile.weight }};
+
+        if (name && duration && intensity && workoutMetValues[name]) {
+            const met = workoutMetValues[name][intensity];
+            const caloriesBurned = Math.round(met * weight * (duration / 60));
+            estimatedCaloriesDisplay.textContent = caloriesBurned + ' kcal';
+        } else {
+            estimatedCaloriesDisplay.textContent = '0 kcal';
+        }
+    }
+
+    // Dastlabki hisoblash
+    calculateCaloriesBurned();
+
+    // O'zgarishlarni kuzatish
+    nameSelect.addEventListener('change', calculateCaloriesBurned);
+    durationInput.addEventListener('input', calculateCaloriesBurned);
+    intensitySelect.addEventListener('change', calculateCaloriesBurned);
+});
+</script>
+{% endblock %}
+{% endblock %}

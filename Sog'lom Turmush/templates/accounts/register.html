@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="max-w-md w-full">
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-green-800">Ro'yxatdan o'tish</h1>
+            <p class="mt-2 text-gray-600">Sog'lom turmush tarziga birinchi qadam</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="px-6 py-4">
+                <h2 class="text-xl font-bold">Shaxsiy ma'lumotlar</h2>
+                <p class="text-gray-500 text-sm">Sog'lom turmush tarzingizni kuzatish uchun ma'lumotlaringizni kiriting</p>
+            </div>
+            <div class="px-6 py-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="space-y-2">
+                            <label for="id_username" class="text-sm font-medium">Foydalanuvchi nomi</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <p class="text-red-500 text-xs">{{ form.username.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="id_password1" class="text-sm font-medium">Parol</label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                                <p class="text-red-500 text-xs">{{ form.password1.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="id_password2" class="text-sm font-medium">Parolni tasdiqlang</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <p class="text-red-500 text-xs">{{ form.password2.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="id_name" class="text-sm font-medium">Ism</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <p class="text-red-500 text-xs">{{ form.name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label for="id_age" class="text-sm font-medium">Yosh</label>
+                                {{ form.age }}
+                                {% if form.age.errors %}
+                                    <p class="text-red-500 text-xs">{{ form.age.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="id_gender" class="text-sm font-medium">Jins</label>
+                                {{ form.gender }}
+                                {% if form.gender.errors %}
+                                    <p class="text-red-500 text-xs">{{ form.gender.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label for="id_weight" class="text-sm font-medium">Vazn (kg)</label>
+                                {{ form.weight }}
+                                {% if form.weight.errors %}
+                                    <p class="text-red-500 text-xs">{{ form.weight.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="id_height" class="text-sm font-medium">Bo'y (cm)</label>
+                                {{ form.height }}
+                                {% if form.height.errors %}
+                                    <p class="text-red-500 text-xs">{{ form.height.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="id_activity_level" class="text-sm font-medium">Faollik darajasi</label>
+                            {{ form.activity_level }}
+                            {% if form.activity_level.errors %}
+                                <p class="text-red-500 text-xs">{{ form.activity_level.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md mt-4">Ro'yxatdan o'tish</button>
+                </form>
+            </div>
+            <div class="px-6 py-4 border-t">
+                <a href="{% url 'login' %}" class="block w-full border border-gray-300 py-2 rounded-md text-center">Ortga qaytish</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

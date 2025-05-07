@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-green-800">Sog'lom Turmush</h1>
+            <div class="flex items-center text-gray-600 hover:text-gray-900 cursor-pointer">
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="flex items-center">
+                        <i data-lucide="log-out" class="h-5 w-5 mr-1"></i>
+                        <span>Chiqish</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="w-full mb-8">
+            <div class="grid w-full grid-cols-4 bg-white rounded-lg p-1">
+                <a href="{% url 'profile' %}" class="tab-button flex items-center justify-center gap-2 py-2 px-4 rounded-md {% if request.resolver_match.url_name == 'profile' %}bg-gray-100{% endif %}">
+                    <i data-lucide="user" class="h-4 w-4"></i>
+                    <span class="hidden sm:inline">Profil</span>
+                </a>
+                <a href="{% url 'food_list' %}" class="tab-button flex items-center justify-center gap-2 py-2 px-4 rounded-md {% if request.resolver_match.url_name == 'food_list' %}bg-gray-100{% endif %}">
+                    <i data-lucide="apple" class="h-4 w-4"></i>
+                    <span class="hidden sm:inline">Ovqatlanish</span>
+                </a>
+                <a href="{% url 'workout_list' %}" class="tab-button flex items-center justify-center gap-2 py-2 px-4 rounded-md {% if request.resolver_match.url_name == 'workout_list' %}bg-gray-100{% endif %}">
+                    <i data-lucide="dumbbell" class="h-4 w-4"></i>
+                    <span class="hidden sm:inline">Mashg'ulot</span>
+                </a>
+                <a href="{% url 'stats' %}" class="tab-button flex items-center justify-center gap-2 py-2 px-4 rounded-md {% if request.resolver_match.url_name == 'stats' %}bg-gray-100{% endif %}">
+                    <i data-lucide="bar-chart-3" class="h-4 w-4"></i>
+                    <span class="hidden sm:inline">Statistika</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold mb-4">Xush kelibsiz, {{ user.profile.name }}!</h2>
+                <p class="text-gray-600">Sog'lom turmush tarzingizni kuzatish uchun yuqoridagi bo'limlardan foydalaning.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <div class="bg-green-50 rounded-lg p-4">
+                        <div class="flex items-center mb-2">
+                            <i data-lucide="activity" class="h-5 w-5 text-green-600 mr-2"></i>
+                            <h3 class="font-medium">BMI ko'rsatkichi</h3>
+                        </div>
+                        <p class="text-3xl font-bold text-green-600">{{ user.profile.calculate_bmi|floatformat:1 }}</p>
+                        <p class="text-sm text-gray-600">{{ user.profile.get_bmi_category }}</p>
+                    </div>
+                    
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <div class="flex items-center mb-2">
+                            <i data-lucide="flame" class="h-5 w-5 text-blue-600 mr-2"></i>
+                            <h3 class="font-medium">Kunlik kaloriya</h3>
+                        </div>
+                        <p class="text-3xl font-bold text-blue-600">{{ user.profile.calculate_daily_calories }}</p>
+                        <p class="text-sm text-gray-600">kcal</p>
+                    </div>
+                    
+                    <div class="bg-purple-50 rounded-lg p-4">
+                        <div class="flex items-center mb-2">
+                            <i data-lucide="target" class="h-5 w-5 text-purple-600 mr-2"></i>
+                            <h3 class="font-medium">Maqsadlar</h3>
+                        </div>
+                        <p class="text-sm text-gray-600">Sog'lom turmush tarzingizni kuzatish uchun maqsadlar qo'ying</p>
+                        <a href="{% url 'profile' %}" class="text-purple-600 text-sm font-medium mt-2 inline-block">Profilni yangilash</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

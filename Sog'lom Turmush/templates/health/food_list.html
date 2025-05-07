@@ -1,0 +1,186 @@
+{% extends 'accounts/dashboard.html' %}
+{% load health_extras %}
+{% block content %}
+{{ block.super }}
+
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold">Ovqatlanish kuzatuvi</h2>
+        <form method="get" class="flex items-center">
+            <input type="date" name="date" value="{{ today|date:'Y-m-d' }}" class="border border-gray-300 rounded-md px-4 py-2 w-[240px]">
+            <button type="submit" class="ml-2 bg-green-600 text-white px-4 py-2 rounded-md">Ko'rish</button>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-2 space-y-4">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="px-6 py-4 border-b">
+                    <h2 class="text-xl font-bold">Ovqat qo'shish</h2>
+                    <p class="text-gray-500 text-sm">Bugungi ovqatlanishingizni kuzatib boring</p>
+                </div>
+                <div class="px-6 py-4 space-y-4">
+                    <form method="post" action="{% url 'add_food' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="date" value="{{ today|date:'Y-m-d' }}">
+
+                        {% if form.errors %}
+                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                                <strong class="font-bold">Xatolik:</strong>
+                                <ul>
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label for="id_food_name" class="text-sm font-medium">Ovqat tanlash</label>
+                                {{ form.food_name }}
+                            </div>
+                            <div class="space-y-2">
+                                <label for="id_meal_type" class="text-sm font-medium">Ovqat turi</label>
+                                {{ form.meal_type }}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div class="space-y-2">
+                                <label for="id_calories" class="text-sm font-medium">Kaloriya</label>
+                                {{ form.calories }}
+                            </div>
+                            <div class="space-y-2">
+                                <label for="id_protein" class="text-sm font-medium">Oqsil (g)</label>
+                                {{ form.protein }}
+                            </div>
+                            <div class="space-y-2">
+                                <label for="id_carbs" class="text-sm font-medium">Uglevodlar (g)</label>
+                                {{ form.carbs }}
+                            </div>
+                            <div class="space-y-2">
+                                <label for="id_fat" class="text-sm font-medium">Yog'lar (g)</label>
+                                {{ form.fat }}
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md mt-4">Qo'shish</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b">
+                <h2 class="text-xl font-bold">Kunlik hisobot</h2>
+                <p class="text-gray-500 text-sm">{{ today|date:'Y-m-d' }} uchun</p>
+            </div>
+            <div class="px-6 py-4 space-y-4">
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-sm font-medium">Jami kaloriya:</span>
+                        <span class="text-sm font-bold">{{ total_calories }} kcal</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm font-medium">Qolgan kaloriya:</span>
+                        <span class="text-sm font-bold">{{ remaining_calories }} kcal</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm font-medium">Tavsiya etilgan:</span>
+                        <span class="text-sm font-bold">{{ daily_calories }} kcal</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="text-sm font-medium">Kaloriya maqsadi</h4>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-green-600 h-2.5 rounded-full" style="width: {{ total_calories|divide:daily_calories|multiply:100 }}%"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="text-sm font-medium">Makronutriyentlar</h4>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="bg-blue-100 p-2 rounded-md">
+                            <div class="text-lg font-bold text-blue-700">{{ total_protein|floatformat:1 }}g</div>
+                            <div class="text-xs text-gray-600">Oqsil</div>
+                        </div>
+                        <div class="bg-green-100 p-2 rounded-md">
+                            <div class="text-lg font-bold text-green-700">{{ total_carbs|floatformat:1 }}g</div>
+                            <div class="text-xs text-gray-600">Uglevodlar</div>
+                        </div>
+                        <div class="bg-red-100 p-2 rounded-md">
+                            <div class="text-lg font-bold text-red-700">{{ total_fat|floatformat:1 }}g</div>
+                            <div class="text-xs text-gray-600">Yog'lar</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b">
+            <h2 class="text-xl font-bold">Kiritilgan ovqatlar</h2>
+            <p class="text-gray-500 text-sm">{{ today|date:'Y-m-d' }} kuni uchun kiritilgan ovqatlar ro'yxati</p>
+        </div>
+        <div class="px-6 py-4">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ovqat nomi</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ovqat turi</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kaloriya</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Oqsil</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uglevodlar</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Yog'lar</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amallar</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for food in foods %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ food.food_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ food.meal_type }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ food.calories }} kcal</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ food.protein }}g</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ food.carbs }}g</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ food.fat }}g</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <a href="{% url 'delete_food' food.id %}" class="text-red-600 hover:text-red-900" onclick="return confirm('Haqiqatan ham bu ovqatni o\'chirmoqchimisiz?');">
+                                <i data-lucide="trash-2" class="h-5 w-5"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr id="no-food-entries" class="text-center">
+                        <td colspan="7" class="px-6 py-6 text-gray-500">Hozircha kiritilgan ovqatlar yo'q</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('id_food_name').addEventListener('change', function() {
+    const foodName = this.value;
+    const nutrients = {{ food_nutrients|safe }};
+    if (foodName && nutrients[foodName]) {
+        document.getElementById('id_calories').value = nutrients[foodName].calories;
+        document.getElementById('id_protein').value = nutrients[foodName].protein;
+        document.getElementById('id_carbs').value = nutrients[foodName].carbs;
+        document.getElementById('id_fat').value = nutrients[foodName].fat;
+    } else {
+        document.getElementById('id_calories').value = '';
+        document.getElementById('id_protein').value = '';
+        document.getElementById('id_carbs').value = '';
+        document.getElementById('id_fat').value = '';
+    }
+});
+</script>
+{% endblock %}
